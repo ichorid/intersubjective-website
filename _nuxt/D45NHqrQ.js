@@ -1,0 +1,1 @@
+import{ay as i,az as u,R as d}from"./CRRJOYo4.js";import{f as a}from"./Cm_z1RtU.js";let c=0;function I(n,t="reka"){const e=i({useId:void 0});return u?`${t}-${u()}`:e.useId?`${t}-${e.useId()}`:`${t}-${++c}`}const o=(n,t,e,...r)=>n[t]?d({...n,[t]:()=>a(n[t](),(e==null?void 0:e.unwrap)||(e==null?void 0:e.mdcUnwrap))},t,e,...r):d(n,t,e,...r);export{o as r,I as u};

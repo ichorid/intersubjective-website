@@ -1,1 +1,0 @@
-import{_ as e,d as _,e as n}from"./CuBgDj-9.js";const c={},s={class:"linebreak bg-purple-900/30"};function t(o,r){return n(),_("div",s)}const i=Object.assign(e(c,[["render",t]]),{__name:"Divider"});export{i as _};

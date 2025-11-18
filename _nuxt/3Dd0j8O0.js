@@ -1,0 +1,1 @@
+import{_ as e,d as c,e as n}from"./CRRJOYo4.js";const _={},t={class:"linebreak bg-accent-light"};function s(o,r){return n(),c("div",t)}const i=Object.assign(e(_,[["render",s]]),{__name:"Divider"});export{i as _};
