@@ -3,6 +3,10 @@ FROM node:22.14.0-alpine AS build
 
 WORKDIR /app
 
+# Accept build args for public runtime config
+ARG NUXT_PUBLIC_RECAPTCHA_SITE_KEY
+ENV NUXT_PUBLIC_RECAPTCHA_SITE_KEY=$NUXT_PUBLIC_RECAPTCHA_SITE_KEY
+
 COPY pnpm-lock.yaml package.json ./
 
 COPY . .

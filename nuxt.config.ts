@@ -71,6 +71,10 @@ export default defineNuxtConfig({
         process.env.NUXT_PUBLIC_SITE_URL || "https://intersubjective.space/",
       contactEmail: process.env.CONTACT_EMAIL,
       resend: !!process.env.NUXT_PRIVATE_RESEND_API_KEY,
+      recaptchaSiteKey: process.env.NUXT_PUBLIC_RECAPTCHA_SITE_KEY,
+    },
+    private: {
+      recaptchaSecretKey: process.env.NUXT_PRIVATE_RECAPTCHA_SECRET_KEY,
     },
   },
 

@@ -2,6 +2,16 @@
 import * as z from 'zod'
 import type { FormSubmitEvent } from '#ui/types'
 
+// TypeScript declaration for Google reCAPTCHA
+declare global {
+  interface Window {
+    grecaptcha?: {
+      ready: (callback: () => void) => void
+      execute: (siteKey: string, options: { action: string }) => Promise<string>
+    }
+  }
+}
+
 const { t } = useI18n()
 
 const isResendEnabled = useRuntimeConfig().public.resend
@@ -10,6 +20,7 @@ const state = ref({
   email: '',
   message: '',
   subject: '',
+  honeypot: '',
 })
 
 const schema = z.object({
@@ -20,18 +31,58 @@ const schema = z.object({
 type Schema = z.output<typeof schema>
 
 const loading = ref(false)
+const config = useRuntimeConfig()
+const recaptchaSiteKey = config.public.recaptchaSiteKey
+
+// Wait for reCAPTCHA to load
+const recaptchaReady = ref(false)
+
+onMounted(() => {
+  if (typeof window !== 'undefined' && recaptchaSiteKey) {
+    // Load reCAPTCHA v3 script dynamically with site key
+    const script = document.createElement('script')
+    script.src = `https://www.google.com/recaptcha/api.js?render=${recaptchaSiteKey}`
+    script.async = true
+    script.defer = true
+    script.onload = () => {
+      if (window.grecaptcha) {
+        window.grecaptcha.ready(() => {
+          recaptchaReady.value = true
+        })
+      }
+    }
+    document.head.appendChild(script)
+  } else {
+    recaptchaReady.value = true // Allow form to work without reCAPTCHA in dev
+  }
+})
 
 async function onSubmit(event: FormSubmitEvent<Schema>) {
   loading.value = true
   try {
+    // Get reCAPTCHA token if available
+    let recaptchaToken = ''
+    if (recaptchaSiteKey && recaptchaReady.value && typeof window !== 'undefined' && window.grecaptcha) {
+      try {
+        recaptchaToken = await window.grecaptcha.execute(recaptchaSiteKey, { action: 'submit' })
+      } catch (error) {
+        console.error('reCAPTCHA error:', error)
+      }
+    }
+
     await $fetch('/api/emails/send', {
       method: 'POST',
-      body: event.data,
+      body: {
+        ...event.data,
+        honeypot: state.value.honeypot,
+        'recaptcha-token': recaptchaToken,
+      },
     })
     state.value = {
       email: '',
       message: '',
       subject: '',
+      honeypot: '',
     }
     toast.success(t('contact.success'))
   }
@@ -102,6 +153,20 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
             placeholder="Lets work together!"
           />
         </UFormField>
+        
+        <!-- Honeypot field - hidden from users but visible to bots -->
+        <div style="position: absolute; left: -9999px; opacity: 0; pointer-events: none;">
+          <label for="website">Website (leave blank)</label>
+          <input
+            id="website"
+            v-model="state.honeypot"
+            type="text"
+            name="website"
+            autocomplete="off"
+            tabindex="-1"
+          />
+        </div>
+        
         <div class="flex justify-center">
           <UTooltip
             :disabled="!isResendEnabled"

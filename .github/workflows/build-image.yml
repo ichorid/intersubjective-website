@@ -59,3 +59,4 @@ jobs:
           build-args: |
             TURBO_TEAM=${{ vars.TURBO_TEAM }}
             TURBO_TOKEN=${{ secrets.TURBO_TOKEN }}
+            NUXT_PUBLIC_RECAPTCHA_SITE_KEY=${{ secrets.NUXT_PUBLIC_RECAPTCHA_SITE_KEY }}
